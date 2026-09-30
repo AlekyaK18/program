@@ -1,30 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bike Racing Game</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreshMart | Grocery Shopping</title>
+  <meta name="description" content="FreshMart has fresh groceries, pantry essentials, and faster delivery for everyday shopping." />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="page-shell">
-        <div class="race-image-panel">
-            <img src="https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80" alt="Racing circuit view">
+  <nav class="navbar">
+    <div class="container nav-wrapper">
+      <div class="logo">FreshMart</div>
+      <ul class="nav-menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#cart" class="cart-btn">Cart (<span id="cart-count">0</span>)</a>
+    </div>
+  </nav>
+
+  <header id="home" class="hero">
+    <div class="container hero-content">
+      <p class="tag">Fresh groceries delivered fast</p>
+      <h1>Healthy food for your everyday life</h1>
+      <p>Your one-stop shop for fruits, vegetables, dairy, and pantry essentials.</p>
+      <button class="primary-btn" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+        Shop now
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section id="products" class="products">
+      <div class="container">
+        <div class="section-header">
+          <h2>Popular Products</h2>
         </div>
 
-        <div id="gameContainer">
-            <canvas id="gameCanvas" width="800" height="400"></canvas>
-            <div id="ui">
-                <div id="score">Score: 0</div>
-                <div id="speed">Speed: 0</div>
-                <div id="gameOver" style="display: none;">
-                    <h2>Game Over!</h2>
-                    <p id="finalScore">Final Score: 0</p>
-                    <button onclick="location.reload()">Play Again</button>
-                </div>
-            </div>
+        <div class="category-bar">
+          <button class="category-btn active" data-category="all">All</button>
+          <button class="category-btn" data-category="fruits">Fruits</button>
+          <button class="category-btn" data-category="vegetables">Vegetables</button>
+          <button class="category-btn" data-category="dairy">Dairy</button>
+          <button class="category-btn" data-category="pantry">Pantry</button>
         </div>
+
+        <div id="product-grid" class="product-grid"></div>
+      </div>
+    </section>
+
+    <section id="cart" class="cart-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Your Cart</h2>
+        </div>
+
+        <div class="cart-layout">
+          <div id="cart-items" class="cart-items"></div>
+          <aside class="checkout-panel">
+            <h3>Order Summary</h3>
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="subtotal">$0.00</span>
+            </div>
+            <div class="summary-line">
+              <span>Tax</span>
+              <span id="tax">$0.00</span>
+            </div>
+            <div class="summary-line total">
+              <span>Total</span>
+              <span id="total">$0.00</span>
+            </div>
+            <button class="primary-btn full-width" id="checkout-btn">Proceed to Checkout</button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="container">
+        <div class="section-header">
+          <h2>Why choose FreshMart?</h2>
+        </div>
+        <div class="about-grid">
+          <div class="about-card">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" alt="Fresh produce" />
+            <h3>Freshness Guarantee</h3>
+            <p>We source quality produce and staple products that are fresh, safe, and tasty.</p>
+          </div>
+          <div class="about-card">
+            <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80" alt="Fast grocery delivery" />
+            <h3>Fast Delivery</h3>
+            <p>Same-day delivery on selected orders so your groceries arrive when you need them.</p>
+          </div>
+          <div class="about-card">
+            <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80" alt="Low-cost groceries" />
+            <h3>Affordable Prices</h3>
+            <p>Enjoy everyday low prices and value-packed bundles for your regular shopping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2>Contact Us</h2>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>Call</h3>
+            <p>+1 (800) 555-0123</p>
+          </div>
+          <div class="contact-card">
+            <h3>Email</h3>
+            <p>hello@freshmart.com</p>
+          </div>
+          <div class="contact-card">
+            <h3>Address</h3>
+            <p>25 Market Street, Springfield</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 FreshMart. All rights reserved.</p>
     </div>
-    <script src="game.js"></script>
+  </footer>
+
+  <div id="checkout-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal">×</span>
+      <h3>Checkout</h3>
+      <form id="checkout-form">
+        <label>
+          Full name
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+        <label>
+          Delivery address
+          <textarea name="address" rows="3" required></textarea>
+        </label>
+        <label>
+          Phone
+          <input type="tel" name="phone" required />
+        </label>
+        <label>
+          Payment method
+          <select name="payment" required>
+            <option value="">Select</option>
+            <option value="Card">Card</option>
+            <option value="UPI">UPI</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+          </select>
+        </label>
+        <button type="submit" class="primary-btn full-width">Place Order</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
