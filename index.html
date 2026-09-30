@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Racing Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="ui">
+            <div id="score">Score: 0</div>
+            <div id="speed">Speed: 0</div>
+            <div id="gameOver" style="display: none;">
+                <h2>Game Over!</h2>
+                <p id="finalScore">Final Score: 0</p>
+                <button onclick="location.reload()">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
