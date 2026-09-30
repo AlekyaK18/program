@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Sprint</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #10131b; font-family: Arial, sans-serif; overflow: hidden; }
+    #game { position: relative; width: min(94vw, 900px); }
+    canvas { display: block; width: 100%; height: auto; border: 3px solid #e10600; border-radius: 12px; background: #237a32; box-shadow: 0 12px 40px #0008; }
+    #hud { position: absolute; inset: 14px 18px auto; display: flex; justify-content: space-between; gap: 12px; font-weight: bold; font-size: clamp(12px, 2vw, 18px); text-shadow: 2px 2px #000; pointer-events: none; }
+    #message { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; pointer-events: none; }
+    #message div { background: #000b; padding: 22px 30px; border: 2px solid #fff; border-radius: 12px; }
+    button { margin-top: 12px; padding: 10px 20px; border: 0; border-radius: 7px; background: #e10600; color: white; font-weight: bold; cursor: pointer; }
+    .mobile-controls { display: flex; justify-content: center; gap: 14px; margin-top: 12px; }
+    .mobile-controls button { margin: 0; width: 90px; font-size: 20px; background: #303747; border: 1px solid #68738b; }
+    small { display:block; margin-top: 8px; color:#ddd; }
+  </style>
+</head>
+<body>
+  <main id="game">
+    <canvas id="track" width="900" height="600"></canvas>
+    <div id="hud"><span id="lap">LAP 1 / 3</span><span id="speed">SPEED 0</span><span id="score">SCORE 0</span></div>
+    <div id="message"><div><h1>F1 SPRINT</h1><p>Finish 3 laps before the timer runs out!</p><small>Use ← → or A/D to steer</small><button id="start">START RACE</button></div></div>
+    <div class="mobile-controls"><button data-key="ArrowLeft">◀</button><button data-key="ArrowRight">▶</button></div>
+  </main>
+  <script>
+    const canvas = document.getElementById('track'), ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const state = { running:false, distance:0, laps:0, score:0, speed:0, time:0, last:0, keys:{} };
+    const car = { x: W/2, y: H-105, w:30, h:58 };
+    const rivals = [{x:-.28, lane:0, speed:.73, color:'#178cff'}, {x:.2, lane:1, speed:.63, color:'#ffd21f'}, {x:.52, lane:2, speed:.82, color:'#38d66b'}];
+    const roadWidth = 390;
+    const $ = id => document.getElementById(id);
+    function roadCenter(y) { return W/2 + Math.sin((state.distance*.0015) + y*.012) * 95; }
+    function drawCar(x,y,color,player=false) { ctx.save(); ctx.translate(x,y); ctx.fillStyle='#111'; ctx.fillRect(-car.w/2-4,-car.h/2+8,8,18); ctx.fillRect(car.w/2-4,-car.h/2+8,8,18); ctx.fillRect(-car.w/2-4,car.h/2-26,8,18); ctx.fillRect(car.w/2-4,car.h/2-26,8,18); ctx.fillStyle=color; ctx.roundRect(-car.w/2,-car.h/2,car.w,car.h,7); ctx.fill(); ctx.fillStyle=player?'#fff':'#bde5ff'; ctx.fillRect(-9,-10,18,15); ctx.fillStyle='#111'; ctx.fillRect(-11,18,22,7); ctx.restore(); }
+    function draw() {
+      ctx.fillStyle='#227c35'; ctx.fillRect(0,0,W,H);
+      for(let y=0;y<H;y+=30){ const c=roadCenter(y); ctx.fillStyle=(Math.floor((y+state.distance*.35)/30)%2?'#eee':'#d22'); ctx.fillRect(c-roadWidth/2-10,y,10,30); ctx.fillRect(c+roadWidth/2,y,10,30); }
+      ctx.beginPath(); ctx.moveTo(roadCenter(0)-roadWidth/2,0); for(let y=0;y<=H;y+=12)ctx.lineTo(roadCenter(y)-roadWidth/2,y); for(let y=H;y>=0;y-=12)ctx.lineTo(roadCenter(y)+roadWidth/2,y); ctx.closePath(); ctx.fillStyle='#4a4a52'; ctx.fill();
+      ctx.strokeStyle='#f7f7f7'; ctx.lineWidth=5; ctx.setLineDash([38,32]); ctx.lineDashOffset=state.distance*.5; ctx.beginPath(); ctx.moveTo(roadCenter(0),0); ctx.lineTo(roadCenter(H),H); ctx.stroke(); ctx.setLineDash([]);
+      rivals.forEach(r=>{ const y=(r.x*H + state.distance*r.speed)% (H+100)-70; drawCar(roadCenter(y)+(-roadWidth/2+55+r.lane*110),y,r.color); });
+      drawCar(car.x,car.y,'#e10600',true);
+    }
+    function update(t){ const dt=Math.min((t-state.last)/16.67,2); state.last=t; if(state.running){ state.time-=dt/60; const steer=(state.keys.ArrowRight||state.keys.d?1:0)-(state.keys.ArrowLeft||state.keys.a?1:0); state.speed=Math.min(12,state.speed+.08*dt); car.x+=steer*6*dt; const center=roadCenter(car.y); car.x=Math.max(center-roadWidth/2+24,Math.min(center+roadWidth/2-24,car.x)); state.distance+=state.speed*dt; state.score+=Math.round(state.speed*dt); const newLaps=Math.floor(state.distance/1800); if(newLaps>state.laps)state.laps=newLaps; if(state.laps>=3 || state.time<=0) finish(state.laps>=3); $('lap').textContent=`LAP ${Math.min(state.laps+1,3)} / 3`; $('speed').textContent=`SPEED ${Math.round(state.speed*20)}`; $('score').textContent=`SCORE ${state.score}`; } draw(); requestAnimationFrame(update); }
+    function finish(win){ state.running=false; $('message').style.display='grid'; $('message').querySelector('h1').textContent=win?'🏆 YOU WIN!':'TIME UP'; $('message').querySelector('p').textContent=`Final score: ${state.score}`; $('start').textContent='RACE AGAIN'; }
+    function start(){ Object.assign(state,{running:true,distance:0,laps:0,score:0,speed:3,time:45}); car.x=W/2; $('message').style.display='none'; }
+    addEventListener('keydown',e=>{ state.keys[e.key]=true; if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault(); }); addEventListener('keyup',e=>state.keys[e.key]=false); $('start').onclick=start;
+    document.querySelectorAll('[data-key]').forEach(b=>{ const k=b.dataset.key; b.onpointerdown=()=>state.keys[k]=true; b.onpointerup=b.onpointerleave=()=>state.keys[k]=false; });
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>
